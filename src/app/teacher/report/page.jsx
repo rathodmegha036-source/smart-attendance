@@ -16,7 +16,6 @@ export default function ReportPage() {
   const fetchReport = async () => {
     setLoading(true);
 
-    // ✅ Get logged-in teacher
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -27,7 +26,6 @@ export default function ReportPage() {
       return;
     }
 
-    // ✅ Get sessions created by this teacher
     const { data: teacherSessions, error: sessionError } = await supabase
       .from("sessions")
       .select("id")
@@ -41,14 +39,14 @@ export default function ReportPage() {
 
     const sessionIds = teacherSessions.map((s) => s.id);
 
-    // ✅ Get attendance only for teacher’s sessions
+    // ✅ FIXED JOIN HERE
     const { data, error } = await supabase
       .from("attendance")
       .select(`
         id,
         scanned_at,
         status,
-        student:profiles!attendance_student_id_fkey (
+        profiles (
           full_name
         ),
         sessions (
@@ -113,7 +111,8 @@ export default function ReportPage() {
                     className="border-b hover:bg-gray-50 transition"
                   >
                     <td className="p-4 font-medium">
-                      {r.student?.full_name || "Unknown"}
+                      {/* ✅ FIXED DISPLAY HERE */}
+                      {r.profiles?.full_name || "Unknown"}
                     </td>
 
                     <td className="p-4">{r.sessions?.subject || "N/A"}</td>
@@ -145,4 +144,3 @@ export default function ReportPage() {
     </div>
   );
 }
-
