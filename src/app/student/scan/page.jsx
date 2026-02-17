@@ -14,6 +14,8 @@ export default function ScanPage() {
   const handleScan = async (token) => {
     if (!token) return;
 
+    const cleanedToken = token.trim(); // ✅ FIX ADDED HERE
+
     setLoading(true);
     setError("");
     setSuccess(false);
@@ -28,11 +30,10 @@ export default function ScanPage() {
       return;
     }
 
-    // ✅ CHANGED PART STARTS HERE
     const { data: sessions, error: sessionError } = await supabase
       .from("sessions")
       .select("id")
-      .eq("qr_token", token)
+      .eq("qr_token", cleanedToken) // ✅ USE cleanedToken
       .eq("is_active", true);
 
     if (sessionError) {
@@ -48,7 +49,6 @@ export default function ScanPage() {
     }
 
     const session = sessions[0];
-    // ✅ CHANGED PART ENDS HERE
 
     const { error: attendanceError } = await supabase
       .from("attendance")
