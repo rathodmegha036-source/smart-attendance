@@ -16,6 +16,32 @@ export default function ReportPage() {
   const fetchReport = async () => {
     setLoading(true);
 
+    // ✅ Get logged-in teacher
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setRecords([]);
+      setLoading(false);
+      return;
+    }
+
+    // ✅ Get sessions created by this teacher
+    const { data: teacherSessions, error: sessionError } = await supabase
+      .from("sessions")
+      .select("id")
+      .eq("teacher_id", user.id);
+
+    if (sessionError || !teacherSessions || teacherSessions.length === 0) {
+      setRecords([]);
+      setLoading(false);
+      return;
+    }
+
+    const sessionIds = teacherSessions.map((s) => s.id);
+
+    // ✅ Get attendance only for teacher’s sessions
     const { data, error } = await supabase
       .from("attendance")
       .select(`
@@ -29,10 +55,12 @@ export default function ReportPage() {
           subject
         )
       `)
+      .in("session_id", sessionIds)
       .order("scanned_at", { ascending: false });
 
     if (error) {
       console.error("Report error:", error);
+      setRecords([]);
     } else {
       setRecords(data || []);
     }
@@ -43,7 +71,6 @@ export default function ReportPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-10">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-        {/* Back to Teacher Dashboard button */}
         <div className="mb-6 flex justify-start">
           <button
             onClick={() => router.push("/teacher/dashboard")}
@@ -118,3 +145,4 @@ export default function ReportPage() {
     </div>
   );
 }
+
