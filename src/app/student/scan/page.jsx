@@ -28,18 +28,27 @@ export default function ScanPage() {
       return;
     }
 
-    const { data: session, error: sessionError } = await supabase
+    // ✅ CHANGED PART STARTS HERE
+    const { data: sessions, error: sessionError } = await supabase
       .from("sessions")
       .select("id")
       .eq("qr_token", token)
-      .eq("is_active", true)
-      .single();
+      .eq("is_active", true);
 
-    if (sessionError || !session) {
+    if (sessionError) {
+      setError("Server error. Try again.");
+      setLoading(false);
+      return;
+    }
+
+    if (!sessions || sessions.length === 0) {
       setError("Invalid or expired QR code.");
       setLoading(false);
       return;
     }
+
+    const session = sessions[0];
+    // ✅ CHANGED PART ENDS HERE
 
     const { error: attendanceError } = await supabase
       .from("attendance")
@@ -59,7 +68,6 @@ export default function ScanPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex flex-col items-center p-6">
-      {/* Back to Dashboard button - top left */}
       <div className="w-full max-w-lg mb-6 flex justify-start">
         <button
           onClick={() => router.push("/student/dashboard")}
