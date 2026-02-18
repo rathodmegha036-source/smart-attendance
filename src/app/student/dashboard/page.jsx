@@ -20,6 +20,7 @@ export default function StudentDashboard() {
 
     if (!user) {
       setLoading(false);
+      router.replace("/login");
       return;
     }
 
@@ -33,10 +34,14 @@ export default function StudentDashboard() {
     setLoading(false);
   };
 
-  // ✅ Logout Function
+  // ✅ Proper Logout Function
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login"); // redirect after logout
+    const { error } = await supabase.auth.signOut();
+
+    if (!error) {
+      router.replace("/login"); // redirect to login
+      router.refresh();         // clear session state
+    }
   };
 
   if (loading) {
