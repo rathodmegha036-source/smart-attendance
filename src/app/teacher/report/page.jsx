@@ -26,6 +26,7 @@ export default function ReportPage() {
       return;
     }
 
+    // Get teacher sessions
     const { data: teacherSessions, error: sessionError } = await supabase
       .from("sessions")
       .select("id")
@@ -39,17 +40,17 @@ export default function ReportPage() {
 
     const sessionIds = teacherSessions.map((s) => s.id);
 
-    // ✅ FIXED JOIN HERE
+    // ✅ FIXED RELATIONS HERE
     const { data, error } = await supabase
       .from("attendance")
       .select(`
         id,
         scanned_at,
         status,
-        profiles (
+        profiles:student_id (
           full_name
         ),
-        sessions (
+        sessions:session_id (
           subject
         )
       `)
@@ -111,11 +112,12 @@ export default function ReportPage() {
                     className="border-b hover:bg-gray-50 transition"
                   >
                     <td className="p-4 font-medium">
-                      {/* ✅ FIXED DISPLAY HERE */}
                       {r.profiles?.full_name || "Unknown"}
                     </td>
 
-                    <td className="p-4">{r.sessions?.subject || "N/A"}</td>
+                    <td className="p-4">
+                      {r.sessions?.subject || "N/A"}
+                    </td>
 
                     <td className="p-4">
                       <span
