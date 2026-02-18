@@ -28,14 +28,18 @@ export default function StudentHistoryPage() {
       return;
     }
 
+    // ✅ FIX: Filter by logged-in student
     const { data, error } = await supabase
       .from("attendance")
       .select(`
         id,
         status,
         scanned_at,
-        sessions ( subject )
+        sessions:session_id (
+          subject
+        )
       `)
+      .eq("student_id", user.id) // 🔥 THIS LINE FIXES IT
       .order("scanned_at", { ascending: false });
 
     if (error) {
@@ -43,7 +47,7 @@ export default function StudentHistoryPage() {
       setError("Failed to load attendance history.");
       setRecords([]);
     } else {
-      setRecords(data);
+      setRecords(data || []);
     }
 
     setLoading(false);
@@ -51,7 +55,6 @@ export default function StudentHistoryPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      {/* Left-aligned button */}
       <div className="mb-6">
         <button
           onClick={() => router.push("/student/dashboard")}
@@ -61,7 +64,6 @@ export default function StudentHistoryPage() {
         </button>
       </div>
 
-      {/* Centered title */}
       <h1 className="text-3xl font-semibold mb-6 text-center">
         Attendance History
       </h1>
@@ -78,9 +80,15 @@ export default function StudentHistoryPage() {
         <table className="w-full border rounded-lg shadow-md">
           <thead className="bg-blue-100">
             <tr>
-              <th className="p-4 text-left font-medium text-gray-700">Subject</th>
-              <th className="p-4 text-left font-medium text-gray-700">Status</th>
-              <th className="p-4 text-left font-medium text-gray-700">Time</th>
+              <th className="p-4 text-left font-medium text-gray-700">
+                Subject
+              </th>
+              <th className="p-4 text-left font-medium text-gray-700">
+                Status
+              </th>
+              <th className="p-4 text-left font-medium text-gray-700">
+                Time
+              </th>
             </tr>
           </thead>
           <tbody>
