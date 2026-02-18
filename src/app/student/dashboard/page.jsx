@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function StudentDashboard() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     getProfile();
@@ -31,6 +33,12 @@ export default function StudentDashboard() {
     setLoading(false);
   };
 
+  // ✅ Logout Function
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login"); // redirect after logout
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg font-medium">
@@ -41,7 +49,16 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-10">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-10 relative">
+        
+        {/* ✅ Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="absolute top-6 right-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition"
+        >
+          Logout
+        </button>
+
         <h1 className="text-4xl font-extrabold mb-4 text-center text-gray-900">
           Welcome, {profile?.full_name || "Student"} 👋
         </h1>
@@ -69,4 +86,3 @@ export default function StudentDashboard() {
     </div>
   );
 }
-
