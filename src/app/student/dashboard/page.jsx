@@ -18,7 +18,6 @@ export default function StudentDashboard() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    // ✅ FIXED HERE
     if (!user) {
       setLoading(false);
       router.replace("/auth/login");
@@ -35,12 +34,10 @@ export default function StudentDashboard() {
     setLoading(false);
   };
 
-  // ✅ Proper Logout Function
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
-
     if (!error) {
-      router.replace("/auth/login"); // correct path
+      router.replace("/auth/login");
       router.refresh();
     }
   };
@@ -55,16 +52,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-10 relative">
-        
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="absolute top-6 right-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition"
-        >
-          Logout
-        </button>
-
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-10">
         <h1 className="text-4xl font-extrabold mb-4 text-center text-gray-900">
           Welcome, {profile?.full_name || "Student"} 👋
         </h1>
@@ -73,20 +61,31 @@ export default function StudentDashboard() {
           You are logged in as a student
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {/* Card Style Buttons */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           <a
             href="/student/scan"
-            className="block bg-blue-600 text-white p-8 rounded-xl text-center font-semibold text-xl hover:bg-blue-700 transition-shadow shadow-md"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-8 rounded-xl text-center font-semibold text-xl transition shadow-md"
           >
-            📷 Scan Attendance
+            📷
+            <div className="mt-2">Scan Attendance</div>
           </a>
 
           <a
             href="/student/history"
-            className="block bg-green-600 text-white p-8 rounded-xl text-center font-semibold text-xl hover:bg-green-700 transition-shadow shadow-md"
+            className="bg-green-600 hover:bg-green-700 text-white p-8 rounded-xl text-center font-semibold text-xl transition shadow-md"
           >
-            📊 Attendance History
+            📊
+            <div className="mt-2">Attendance History</div>
           </a>
+
+          <button
+            onClick={handleLogout}
+            className="bg-gray-700 hover:bg-gray-800 text-white p-8 rounded-xl text-center font-semibold text-xl transition shadow-md"
+          >
+            🚪
+            <div className="mt-2">Logout</div>
+          </button>
         </div>
       </div>
     </div>
