@@ -18,9 +18,10 @@ export default function StudentDashboard() {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // ✅ FIXED HERE
     if (!user) {
       setLoading(false);
-      router.replace("/login");
+      router.replace("/auth/login");
       return;
     }
 
@@ -39,8 +40,8 @@ export default function StudentDashboard() {
     const { error } = await supabase.auth.signOut();
 
     if (!error) {
-      router.replace("/auth/login"); // redirect to login
-      router.refresh();         // clear session state
+      router.replace("/auth/login"); // correct path
+      router.refresh();
     }
   };
 
@@ -56,7 +57,7 @@ export default function StudentDashboard() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-10 relative">
         
-        {/* ✅ Logout Button */}
+        {/* Logout Button */}
         <button
           onClick={handleLogout}
           className="absolute top-6 right-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition"
