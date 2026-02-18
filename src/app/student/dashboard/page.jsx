@@ -39,7 +39,7 @@ export default function StudentDashboard() {
     const { error } = await supabase.auth.signOut();
 
     if (!error) {
-      router.replace("/login"); // redirect to login
+      router.replace("/auth/login"); // redirect to login
       router.refresh();         // clear session state
     }
   };
